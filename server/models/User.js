@@ -3,6 +3,10 @@ import {Schema} from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
 
 const userSchema = new Schema({
+    CreatedOn:{
+        type:Date,
+        required:true
+    },
     LastName:{
         type: String,
         required: true
@@ -19,6 +23,10 @@ const userSchema = new Schema({
         type:String,
         required: true,
         index: {unique: true}
+    },
+    AccessToken:{
+        type:String,
+        required: false
     }
 });
 mongoose.model('Users',userSchema); 

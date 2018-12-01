@@ -5,7 +5,8 @@ import employees from '../../data/employees'
 const router = express.Router();
 
 router.get('/current_user',(req,res)=>{
-    res.send(req.user);
+    console.log(req.user.accessToken);
+    res.send(JSON.stringify(req.user));
 });
 
 router.get('/employees',(req,res)=>{

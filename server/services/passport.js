@@ -3,6 +3,7 @@ import AzureAdOAuth2Strategy from 'passport-azure-ad-oauth2';
 import keys from '../config/keys';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import { access } from 'fs';
 
 const User = mongoose.model('Users');
 
@@ -18,7 +19,7 @@ passport.deserializeUser((id,done)=>{
 
 export default app => {
     app.use(passport.initialize());
-    // app.use(passport.session());
+    app.use(passport.session());
     passport.use(
         new AzureAdOAuth2Strategy(
             {
@@ -26,23 +27,27 @@ export default app => {
                 clientSecret: keys.Azure.clientSecret,
                 callbackURL: "/auth/azure/callback"
             },
-            async (accessToken,refreshToken,params, profile,done)=>{                            
+            async (accessToken,refreshToken,params, profile,done)=>{
+                console.log(accessToken);
                 var userProfile = jwt.decode(params.id_token);
                 const existingUser = await User.findOne({EmailAddress: userProfile.unique_name},(err,res)=>{
                     if(err){
                         console.log("Err",err);
                     }
-                    console.log("Res",res);
                 })
                 if(existingUser){
-                    console.log(existingUser);
+                    User.update({EmailAddress: userProfile.unique_name},existingUser,(err,raw)=>{
+                        if(err){
+                            console.log("err", err);
+                        }
+                    });
                     done(null, existingUser);
                 }
                 else{
-                    const user = await new User({LastName: userProfile.family_name, FirstName: userProfile.given_name, LastSeen: Date.now(),EmailAddress:userProfile.unique_name}).save();
+                    const user = await new User({CreatedOn:Date.now(), LastName: userProfile.family_name, FirstName: userProfile.given_name, LastSeen: Date.now(),EmailAddress:userProfile.unique_name, AccessToken:accessToken}).save();
                     done(null, user);
                 }
-            }
+            }       
         )
     );
 }

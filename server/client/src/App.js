@@ -1,8 +1,20 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
 
 class App extends Component {
+
+  constructor(props){
+    super(props);
+    this.check = this.check.bind(this);
+  }
+
+  check(){
+    alert("entered check");
+    axios.get('http://localhost:5000/auth/azure');
+  }
+  
   render() {
     return (
       <div className="App">
@@ -11,14 +23,12 @@ class App extends Component {
           <p>
             Edit <code>src/App.js</code> and save to reload.
           </p>
-          <a
+          <button 
             className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+            onClick={this.check}>
             Learn React
-          </a>
+          </button>
+          <a href='http://localhost:5000/auth/azure'>Hello</a>
         </header>
       </div>
     );
